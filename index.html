@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎮 Arcade Arena: Tic Tac Toe + Rock Paper Scissors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0b1120 0%, #19233c 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+            padding: 30px 20px;
+        }
+
+        /* main container */
+        .arena {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* shared card style */
+        .game-card {
+            background: rgba(15, 25, 45, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 48px;
+            padding: 20px 24px 30px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease;
+            width: 100%;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .game-title {
+            font-size: 1.9rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(120deg, #f3e8c2, #c0e0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        /* ----- Tic Tac Toe Styles ----- */
+        .ttt-status {
+            background: #0f172ad9;
+            border-radius: 60px;
+            padding: 10px 18px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .turn-box {
+            background: #1e293b;
+            border-radius: 50px;
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            background: #2d3a4e;
+            transition: all 0.2s;
+        }
+
+        .badge-x {
+            background: #f97316;
+            box-shadow: 0 0 10px #ffb347;
+            color: white;
+        }
+
+        .badge-o {
+            background: #3b82f6;
+            box-shadow: 0 0 10px #60a5fa;
+            color: white;
+        }
+
+        .status-msg {
+            font-weight: bold;
+            background: #00000055;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 1rem;
+            color: #facc15;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .cell {
+            background: #0a0f1ee6;
+            aspect-ratio: 1 / 1;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.6rem;
+            font-weight: 800;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.15s linear;
+            box-shadow: 0 8px 12px -4px black;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .cell.X {
+            color: #ffb347;
+            text-shadow: 0 0 8px #ff9f2e;
+        }
+
+        .cell.O {
+            color: #7aa9ff;
+            text-shadow: 0 0 6px #3b82f6;
+        }
+
+        .cell.win-glow {
+            background: #2e7d64d9;
+            box-shadow: 0 0 0 2px #facc15, 0 0 18px #facc15;
+        }
+
+        /* buttons */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #2d3e5a;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #f1f5f9;
+            cursor: pointer;
+            transition: 0.1s linear;
+            font-family: inherit;
+            box-shadow: 0 4px 0 #0f172a;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0f172a;
+        }
+
+        .btn-reset {
+            background: #dc2626;
+        }
+
+        .btn-new {
+            background: #2b6e4f;
+        }
+
+        /* ----- Rock Paper Scissors Styles ----- */
+        .rps-scoreboard {
+            display: flex;
+            justify-content: space-between;
+            background: #0f172a99;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .score {
+            text-align: center;
+            background: #1e293b;
+            padding: 6px 18px;
+            border-radius: 40px;
+            min-width: 100px;
+        }
+
+        .score span {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: block;
+            color: #ffd966;
+        }
+
+        .choice-area {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .rps-btn {
+            background: #111c2f;
+            border: none;
+            font-size: 3rem;
+            padding: 18px;
+            width: 100px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 8px 0 #03060c;
+            backdrop-filter: blur(4px);
+        }
+
+        .rps-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #03060c;
+        }
+
+        .rps-result {
+            text-align: center;
+            background: #00000066;
+            border-radius: 50px;
+            padding: 14px;
+            margin: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .versus {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            font-size: 1.6rem;
+            background: #0f172a70;
+            border-radius: 80px;
+            padding: 12px;
+        }
+
+        .versus div {
+            background: #0a0f1a;
+            padding: 12px 20px;
+            border-radius: 50px;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .reset-rps {
+            background: #4b5563;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 800px) {
+            .arena {
+                flex-direction: column;
+            }
+            .rps-btn {
+                width: 75px;
+                font-size: 2.2rem;
+                padding: 12px;
+            }
+            .cell {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="arena">
+    <!-- TIC TAC TOE SECTION -->
+    <div class="game-card">
+        <div class="game-title">
+            <span>❌⭕</span> TIC TAC TOE <span>🎯</span>
+        </div>
+        <div class="ttt-status">
+            <div class="turn-box">
+                <span style="color:#b9c7db;">Turn</span>
+                <div class="badge" id="tttTurnBadge">X</div>
+            </div>
+            <div class="status-msg" id="tttStatusMsg">✨ X's turn</div>
+        </div>
+        <div class="board" id="tttBoard"></div>
+        <div class="btn-group">
+            <button class="btn btn-reset" id="tttResetBtn">⟳ Reset</button>
+            <button class="btn btn-new" id="tttNewBtn">✨ New Game</button>
+        </div>
+        <div style="text-align:center; margin-top: 16px; font-size:0.75rem; opacity:0.7;">⚡ X always starts</div>
+    </div>
+
+    <!-- ROCK PAPER SCISSORS SECTION -->
+    <div class="game-card">
+        <div class="game-title">
+            <span>✊📄✂️</span> ROCK PAPER SCISSORS <span>🤖</span>
+        </div>
+        <div class="rps-scoreboard">
+            <div class="score">🧑 YOU <span id="playerScore">0</span></div>
+            <div class="score">🤖 COM <span id="compScore">0</span></div>
+            <div class="score">🤝 TIES <span id="tiesCount">0</span></div>
+        </div>
+        <div class="choice-area">
+            <button class="rps-btn" data-choice="rock">✊</button>
+            <button class="rps-btn" data-choice="paper">📄</button>
+            <button class="rps-btn" data-choice="scissors">✂️</button>
+        </div>
+        <div class="versus" id="rpsVersus">
+            <div>🧑 ?</div>
+            <div>🤖 ?</div>
+        </div>
+        <div class="rps-result" id="rpsResultMsg">👉 Click a button to play!</div>
+        <div class="btn-group">
+            <button class="btn reset-rps" id="rpsResetBtn">🔄 Reset Score</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- TIC TAC TOE MODULE ----------
+    let tttBoard = ["", "", "", "", "", "", "", "", ""];
+    let tttCurrent = "X";
+    let tttActive = true;
+    let tttWinnerInfo = null; // {winner, combo}
+
+    const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+    ];
+
+    const tttBoardDiv = document.getElementById("tttBoard");
+    const tttTurnBadge = document.getElementById("tttTurnBadge");
+    const tttStatusMsg = document.getElementById("tttStatusMsg");
+    const tttResetBtn = document.getElementById("tttResetBtn");
+    const tttNewBtn = document.getElementById("tttNewBtn");
+
+    function renderTTT() {
+        const cells = document.querySelectorAll(".ttt-cell");
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+            const mark = tttBoard[i];
+            cell.textContent = mark;
+            cell.classList.remove("X", "O", "win-glow");
+            if (mark === "X") cell.classList.add("X");
+            if (mark === "O") cell.classList.add("O");
+        }
+        if (tttWinnerInfo && tttWinnerInfo.combo) {
+            const cells = document.querySelectorAll(".ttt-cell");
+            tttWinnerInfo.combo.forEach(idx => {
+                if (cells[idx]) cells[idx].classList.add("win-glow");
+            });
+        }
+    }
+
+    function updateTTTUI() {
+        if (!tttActive) {
+            if (tttWinnerInfo && tttWinnerInfo.winner) {
+                tttStatusMsg.innerHTML = `🏆 Player ${tttWinnerInfo.winner} wins! 🏆`;
+                tttTurnBadge.textContent = tttWinnerInfo.winner;
+                tttTurnBadge.className = tttWinnerInfo.winner === "X" ? "badge badge-x" : "badge badge-o";
+            } else {
+                tttStatusMsg.innerHTML = `🤝 It's a Draw! 🤝`;
+                tttTurnBadge.textContent = "🎲";
+                tttTurnBadge.className = "badge";
+                tttTurnBadge.style.background = "#475569";
+            }
+            return;
+        }
+        tttStatusMsg.innerHTML = `🎯 ${tttCurrent}'s turn`;
+        tttTurnBadge.textContent = tttCurrent;
+        tttTurnBadge.className = tttCurrent === "X" ? "badge badge-x" : "badge badge-o";
+    }
+
+    function checkTTTGameEnd() {
+        for (let combo of winPatterns) {
+            const [a,b,c] = combo;
+            if (tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c]) {
+                tttWinnerInfo = { winner: tttBoard[a], combo: combo };
+                tttActive = false;
+                renderTTT();
+                updateTTTUI();
+                return true;
+            }
+        }
+        const isDraw = tttBoard.every(cell => cell !== "");
+        if (isDraw) {
+            tttActive = false;
+            tttWinnerInfo = null;
+            renderTTT();
+            updateTTTUI();
+            return true;
+        }
+        return false;
+    }
+
+    function tttMove(idx) {
+        if (!tttActive) return false;
+        if (tttBoard[idx] !== "") return false;
+        tttBoard[idx] = tttCurrent;
+        renderTTT();
+        const ended = checkTTTGameEnd();
+        if (!ended) {
+            tttCurrent = (tttCurrent === "X") ? "O" : "X";
+            updateTTTUI();
+        } else {
+            // game ended, do not switch turn
+        }
+        return true;
+    }
+
+    function resetTTT() {
+        tttBoard = ["", "", "", "", "", "", "", "", ""];
+        tttCurrent = "X";
+        tttActive = true;
+        tttWinnerInfo = null;
+        renderTTT();
+        updateTTTUI();
+    }
+
+    function buildTTTBoard() {
+        tttBoardDiv.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell", "ttt-cell");
+            cell.setAttribute("data-idx", i);
+            cell.addEventListener("click", (function(index) {
+                return () => tttMove(index);
+            })(i));
+            tttBoardDiv.appendChild(cell);
+        }
+        resetTTT(); // fresh start
+    }
+
+    tttResetBtn.addEventListener("click", resetTTT);
+    tttNewBtn.addEventListener("click", resetTTT);
+
+    // ---------- ROCK PAPER SCISSORS MODULE ----------
+    let playerScore = 0;
+    let computerScore = 0;
+    let ties = 0;
+    let lastPlayerChoice = "";
+    let lastComputerChoice = "";
+
+    const playerScoreSpan = document.getElementById("playerScore");
+    const compScoreSpan = document.getElementById("compScore");
+    const tiesSpan = document.getElementById("tiesCount");
+    const rpsResultMsg = document.getElementById("rpsResultMsg");
+    const rpsVersusDiv = document.getElementById("rpsVersus");
+    const rpsResetBtn = document.getElementById("rpsResetBtn");
+
+    function updateRPSScoreUI() {
+        playerScoreSpan.textContent = playerScore;
+        compScoreSpan.textContent = computerScore;
+        tiesSpan.textContent = ties;
+    }
+
+    function getComputerChoice() {
+        const choices = ["rock", "paper", "scissors"];
+        const rand = Math.floor(Math.random() * 3);
+        return choices[rand];
+    }
+
+    function getEmoji(choice) {
+        if (choice === "rock") return "✊";
+        if (choice === "paper") return "📄";
+        if (choice === "scissors") return "✂️";
+        return "?";
+    }
+
+    function determineWinner(player, computer) {
+        if (player === computer) return "tie";
+        if (
+            (player === "rock" && computer === "scissors") ||
+            (player === "paper" && computer === "rock") ||
+            (player === "scissors" && computer === "paper")
+        ) {
+            return "player";
+        }
+        return "computer";
+    }
+
+    function playRPS(playerChoice) {
+        const computerChoice = getComputerChoice();
+        lastPlayerChoice = playerChoice;
+        lastComputerChoice = computerChoice;
+        
+        // update versus display
+        rpsVersusDiv.innerHTML = `
+            <div>🧑 ${getEmoji(playerChoice)}</div>
+            <div>🤖 ${getEmoji(computerChoice)}</div>
+        `;
+        
+        const winner = determineWinner(playerChoice, computerChoice);
+        let resultText = "";
+        if (winner === "player") {
+            playerScore++;
+            resultText = `🎉 You win! ${getEmoji(playerChoice)} beats ${getEmoji(computerChoice)} 🎉`;
+            rpsResultMsg.style.color = "#b9fbc0";
+        } else if (winner === "computer") {
+            computerScore++;
+            resultText = `😵 Computer wins! ${getEmoji(computerChoice)} beats ${getEmoji(playerChoice)} 😵`;
+            rpsResultMsg.style.color = "#fda4a4";
+        } else {
+            ties++;
+            resultText = `🤝 It's a tie! Both chose ${getEmoji(playerChoice)} 🤝`;
+            rpsResultMsg.style.color = "#facc15";
+        }
+        rpsResultMsg.innerHTML = resultText;
+        updateRPSScoreUI();
+        
+        // little animation flash effect on result
+        setTimeout(() => {
+            rpsResultMsg.style.color = "#e2e8f0";
+        }, 800);
+    }
+
+    function resetRPSScore() {
+        playerScore = 0;
+        computerScore = 0;
+        ties = 0;
+        updateRPSScoreUI();
+        rpsResultMsg.innerHTML = "✨ Scores reset! Make your move ✨";
+        rpsVersusDiv.innerHTML = `<div>🧑 ?</div><div>🤖 ?</div>`;
+        rpsResultMsg.style.color = "#cbd5e6";
+        lastPlayerChoice = "";
+        lastComputerChoice = "";
+    }
+
+    // attach event listeners for RPS buttons
+    document.querySelectorAll(".rps-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const choice = btn.getAttribute("data-choice");
+            if (choice === "rock" || choice === "paper" || choice === "scissors") {
+                playRPS(choice);
+            }
+        });
+    });
+    rpsResetBtn.addEventListener("click", resetRPSScore);
+
+    // ---------- INITIALIZE EVERYTHING ----------
+    buildTTBTRockPaperScissors();
+    
+    function buildTTBTRockPaperScissors() {
+        buildTTTBoard();    // ttt init
+        // RPS already initialized from static html, but ensure fresh score display
+        updateRPSScoreUI();
+        rpsResultMsg.innerHTML = "👇 Click rock, paper or scissors!";
+    }
+
+    // additional micro interaction: reset TTT on new game also keeps fresh
+    // already done.
+    console.log("Double game arena ready — Tic Tac Toe & Rock Paper Scissors!");
+</script>
+</body>
+</html>
