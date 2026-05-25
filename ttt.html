@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            }
+        body{
+           
+            background-color: #c81919;
+            text-align: center;
+        }
+        .container{
+            height: 70vh;
+        }
+        .game{
+            height: 60vmin;
+            width: 60vmin;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5vmin;
+             margin: 0 auto;
+             background-color: #fff;
+             border-radius: 1vmin;
+        }
+        .box{
+            height: 18vmin;
+            width: 18vmin;
+            border-radius: 1rem;
+            border: none;
+            box-shadow: 0 0 1rem rgb(0, 0, 0, 1);
+            font-size: 10vmin;   
+                font-weight: bold;
+                color: #c81919;
+                cursor: pointer;
+                transition: 0.3s ease;
+        }
+        #reset-btn{
+            padding: 1rem;
+            font-size: 1.5rem;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 1rem;
+         
+        }
+    </style>
+</head>
+<body>
+    <main>
+<h1>Tic Tac Toe </h1>
+<div class="container">
+     <div class="game">
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+        <button class="box"></button>
+     </div>
+     </div>
+     <button id="reset-btn">Restart Game</button>
+    </main>
+    <script>
+        let boxes = document.querySelectorAll('.box');
+        let resetBtn = document.getElementById('reset-btn');
+        
+        let turn=true; // true for X and false for O
+         
+    </script>
+</body>
+</html>
